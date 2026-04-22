@@ -1,4 +1,4 @@
-namespace Venue.Service.Models;
+namespace VenueBooking.Service.Models;
 
 public class Amenity
 {

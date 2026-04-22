@@ -1,5 +1,5 @@
 
-namespace Venue.Service.Models;
+namespace VenueBooking.Service.Models;
 public class VenueImage
 {
     public Guid Id { get; set; }
