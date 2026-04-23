@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using VenueBooking.Service.Models;
 
-namespace Venue.Service;
+namespace VenueBooking.Service;
 
 public class VenueDbContext : DbContext
 {

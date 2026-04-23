@@ -2,10 +2,9 @@
   <Folder Name="/src/">
     <Project Path="src/ApiGateway/ApiGateway.csproj" />
     <Project Path="src/Auth.Service/Auth.Service.csproj" />
-    <Project Path="src/Booking.Service/Booking.Service.csproj" />
+    <Project Path="src/BookingS.Service/Booking.Service.csproj" />
     <Project Path="src/Notification.Service/Notification.Service.csproj" />
-    <Project Path="src/Payment.Service/Payment.Service.csproj" />
     <Project Path="src/Review.Service/Review.Service.csproj" />
-    <Project Path="src/Venue.Service/Venue.Service.csproj" />
+    <Project Path="src/VenueBooking.Service/VenueBooking.Service.csproj" />
   </Folder>
 </Solution>

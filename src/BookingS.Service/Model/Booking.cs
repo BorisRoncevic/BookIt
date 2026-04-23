@@ -1,3 +1,5 @@
+namespace BookingS.Service.Model;
+
 public class Booking
 {
     public Guid Id { get; set; }

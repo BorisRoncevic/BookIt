@@ -1,3 +1,10 @@
+using System.Security.Claims;
+using BookingS.Service.Application.Services;
+using BookingS.Service.Model;
+using Microsoft.AspNetCore.Mvc;
+
+namespace BookingS.Service.Controller;
+
 [ApiController]
 [Route("api/bookings")]
 public class BookingController : ControllerBase
@@ -9,10 +16,20 @@ public class BookingController : ControllerBase
         _service = service;
     }
 
+
     [HttpPost]
-    public async Task<IActionResult> Create(CreateBookingRequest request)
+    public async Task<IActionResult> Create([FromBody] CreateBookingRequest request)
     {
-        var booking = await _service.CreateBookingAsync(request);
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)
+                           ?? User.FindFirst("sub"); 
+
+        if (userIdClaim == null)
+            return Unauthorized();
+
+        var userId = Guid.Parse(userIdClaim.Value);
+
+        var booking = await _service.CreateBookingAsync(request, userId);
+
         return Ok(booking);
     }
 

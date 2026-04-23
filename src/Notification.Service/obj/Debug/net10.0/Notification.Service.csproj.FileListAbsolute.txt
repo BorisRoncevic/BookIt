@@ -1,0 +1,9 @@
+/Users/borisroncevic/Desktop/AirbnbBooking/src/Notification.Service/obj/Debug/net10.0/Notification.Service.csproj.AssemblyReference.cache
+/Users/borisroncevic/Desktop/AirbnbBooking/src/Notification.Service/obj/Debug/net10.0/rpswa.dswa.cache.json
+/Users/borisroncevic/Desktop/AirbnbBooking/src/Notification.Service/obj/Debug/net10.0/Notification.Service.GeneratedMSBuildEditorConfig.editorconfig
+/Users/borisroncevic/Desktop/AirbnbBooking/src/Notification.Service/obj/Debug/net10.0/Notification.Service.AssemblyInfoInputs.cache
+/Users/borisroncevic/Desktop/AirbnbBooking/src/Notification.Service/obj/Debug/net10.0/Notification.Service.AssemblyInfo.cs
+/Users/borisroncevic/Desktop/AirbnbBooking/src/Notification.Service/obj/Debug/net10.0/Notification.Service.csproj.CoreCompileInputs.cache
+/Users/borisroncevic/Desktop/AirbnbBooking/src/Notification.Service/obj/Debug/net10.0/Notification.Service.MvcApplicationPartsAssemblyInfo.cs
+/Users/borisroncevic/Desktop/AirbnbBooking/src/Notification.Service/obj/Debug/net10.0/Notification.Service.MvcApplicationPartsAssemblyInfo.cache
+/Users/borisroncevic/Desktop/AirbnbBooking/src/Notification.Service/obj/Debug/net10.0/Notification.Service.sourcelink.json

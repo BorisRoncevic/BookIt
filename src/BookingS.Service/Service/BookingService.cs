@@ -1,3 +1,9 @@
+using BookingS.Service.Application.Interfaces;
+using BookingS.Service.Model;
+using Booking = BookingS.Service.Model.Booking;
+
+namespace BookingS.Service.Application.Services;
+
 public class BookingService
 {
     private readonly IBookingRepository _repo;
@@ -7,34 +13,37 @@ public class BookingService
         _repo = repo;
     }
 
-    public async Task<Booking> CreateBookingAsync(CreateBookingRequest request)
+    public async Task<Booking> CreateBookingAsync(CreateBookingRequest request, Guid userId)
     {
+        // ✔️ validacija
         if (request.CheckIn >= request.CheckOut)
             throw new Exception("Invalid date range");
 
-        var existing = await _repo.GetByVenueIdAsync(request.VenueId);
-
-        bool overlap = existing.Any(b =>
-            b.Status != BookingStatus.Cancelled &&
-            request.CheckIn < b.CheckOut &&
-            request.CheckOut > b.CheckIn
+        // ✔️ overlap check direktno u DB
+        bool overlap = await _repo.HasOverlapAsync(
+            request.VenueId,
+            request.CheckIn,
+            request.CheckOut
         );
 
         if (overlap)
             throw new Exception("Dates not available");
 
         int nights = (request.CheckOut - request.CheckIn).Days;
-        decimal pricePerNight = 100; 
+
+        // TODO: kasnije iz VenueService
+        decimal pricePerNight = 100;
 
         var booking = new Booking
         {
             Id = Guid.NewGuid(),
             VenueId = request.VenueId,
-            UserId = request.UserId,
+            UserId = userId,
             CheckIn = request.CheckIn,
             CheckOut = request.CheckOut,
             TotalPrice = nights * pricePerNight,
-            Status = BookingStatus.Confirmed
+            Status = BookingStatus.Confirmed,
+            CreatedAt = DateTime.UtcNow
         };
 
         await _repo.AddAsync(booking);
@@ -42,13 +51,17 @@ public class BookingService
         return booking;
     }
 
-    public async Task CancelAsync(Guid id)
+    public async Task<bool> CancelAsync(Guid id)
     {
         var booking = await _repo.GetByIdAsync(id);
-        if (booking == null) throw new Exception("Not found");
+
+        if (booking == null)
+            return false;
 
         booking.Status = BookingStatus.Cancelled;
 
         await _repo.UpdateAsync(booking);
+
+        return true;
     }
 }

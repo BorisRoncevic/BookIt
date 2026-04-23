@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/borisroncevic/Desktop/AirbnbBooking/src/Booking.Service/Booking.Service.csproj": {}
+    "/Users/borisroncevic/Desktop/AirbnbBooking/src/BookingS.Service/Booking.Service.csproj": {}
   },
   "projects": {
-    "/Users/borisroncevic/Desktop/AirbnbBooking/src/Booking.Service/Booking.Service.csproj": {
+    "/Users/borisroncevic/Desktop/AirbnbBooking/src/BookingS.Service/Booking.Service.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/borisroncevic/Desktop/AirbnbBooking/src/Booking.Service/Booking.Service.csproj",
+        "projectUniqueName": "/Users/borisroncevic/Desktop/AirbnbBooking/src/BookingS.Service/Booking.Service.csproj",
         "projectName": "Booking.Service",
-        "projectPath": "/Users/borisroncevic/Desktop/AirbnbBooking/src/Booking.Service/Booking.Service.csproj",
+        "projectPath": "/Users/borisroncevic/Desktop/AirbnbBooking/src/BookingS.Service/Booking.Service.csproj",
         "packagesPath": "/Users/borisroncevic/.nuget/packages/",
-        "outputPath": "/Users/borisroncevic/Desktop/AirbnbBooking/src/Booking.Service/obj/",
+        "outputPath": "/Users/borisroncevic/Desktop/AirbnbBooking/src/BookingS.Service/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/borisroncevic/.nuget/NuGet/NuGet.Config"
@@ -44,7 +44,23 @@
         "net10.0": {
           "targetAlias": "net10.0",
           "dependencies": {
+            "MailKit": {
+              "target": "Package",
+              "version": "[4.16.0, )"
+            },
+            "Microsoft.AspNetCore.Authentication.JwtBearer": {
+              "target": "Package",
+              "version": "[10.0.6, )"
+            },
             "Microsoft.AspNetCore.OpenApi": {
+              "target": "Package",
+              "version": "[10.0.6, )"
+            },
+            "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[10.0.6, )"
+            },
+            "Microsoft.EntityFrameworkCore.SqlServer": {
               "target": "Package",
               "version": "[10.0.6, )"
             }

@@ -1,4 +1,4 @@
-@Review.Service_HostAddress = http://localhost:5245
+@Review.Service_HostAddress = http://localhost:5005
 
 GET {{Review.Service_HostAddress}}/weatherforecast/
 Accept: application/json

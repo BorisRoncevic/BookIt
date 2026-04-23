@@ -1,31 +1,33 @@
+using System.Xml.Serialization;
 using Microsoft.AspNetCore.Mvc;
-using Venue.Service.Application.Interfaces;
+using VenueBooking.Service.Application.Interfaces;
 using VenueBooking.Service.Models;
+using VenueBooking.Service.Application.Services;
 
-namespace Venue.Service.Controller;
+namespace VenueBooking.Service.Controller;
 
 [ApiController]
 [Route("api/[controller]")]
 public class VenuesController : ControllerBase
 {
-    private readonly IVenueRepository _repository;
+    private readonly VenueService _service;
 
-    public VenuesController(IVenueRepository repository)
+    public VenuesController(VenueService service)
     {
-        _repository = repository;
+        _service = service;
     }
 
     [HttpGet]
     public async Task<ActionResult<List<Venue>>> GetAll()
     {
-        var venues = await _repository.GetAllAsync();
+        var venues = await _service.GetAllAsync();
         return Ok(venues);
     }
 
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<Venue>> GetById(Guid id)
     {
-        var venue = await _repository.GetByIdAsync(id);
+        var venue = await _service.GetByIdAsync(id);
 
         if (venue == null)
             return NotFound();
@@ -36,7 +38,7 @@ public class VenuesController : ControllerBase
     [HttpPost]
     public async Task<ActionResult> Create([FromBody] Venue venue)
     {
-        await _repository.AddAsync(venue);
+        await _service.CreateAsync(venue);
 
         return CreatedAtAction(
             nameof(GetById),
@@ -51,11 +53,9 @@ public class VenuesController : ControllerBase
         if (id != venue.Id)
             return BadRequest();
 
-        var exists = await _repository.ExistsAsync(id);
-        if (!exists)
+        var success = await _service.UpdateAsync(id, venue);
+        if (!success)
             return NotFound();
-
-        await _repository.UpdateAsync(venue);
 
         return NoContent();
     }
@@ -64,11 +64,9 @@ public class VenuesController : ControllerBase
     [HttpDelete("{id:guid}")]
     public async Task<ActionResult> Delete(Guid id)
     {
-        var exists = await _repository.ExistsAsync(id);
-        if (!exists)
+        var success = await _service.DeleteAsync(id);
+        if (!success)
             return NotFound();
-
-        await _repository.DeleteAsync(id);
 
         return NoContent();
     }
