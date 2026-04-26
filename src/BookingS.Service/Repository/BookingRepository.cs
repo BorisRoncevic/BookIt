@@ -42,11 +42,27 @@ public class BookingRepository : IBookingRepository
     {
         return await _context.Bookings.AnyAsync(b =>
             b.VenueId == venueId &&
-            b.Status != BookingStatus.Cancelled &&
+            b.Status != BookingStatus.Confirmed &&
             checkIn < b.CheckOut &&
             checkOut > b.CheckIn
         );
     }
+    public async Task<List<BookedRangeResponse>> GetBookedRangesAsync(Guid venueId)
+{
+    return await _context.Bookings
+        .Where(b =>
+            b.VenueId == venueId &&
+            b.Status == BookingStatus.Confirmed
+        )
+        .Select(b => new BookedRangeResponse
+        {
+            CheckIn = b.CheckIn,
+            CheckOut = b.CheckOut
+        })
+        .ToListAsync();
+}
+
+    
 public async Task<List<Booking>> GetByUserIdAsync(Guid userId)
 {
     return await _context.Bookings

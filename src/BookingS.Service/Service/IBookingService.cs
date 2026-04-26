@@ -6,5 +6,6 @@ namespace BookingS.Service.Application.Services;
 public interface IBookingService
 {
     Task<Booking> CreateBookingAsync(CreateBookingRequest request, Guid userId);
+        Task<List<BookedRangeResponse>> GetBookedRangesAsync(Guid venueId);
     Task<bool> CancelAsync(Guid id);
 }

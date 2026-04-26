@@ -1,9 +1,6 @@
-
 namespace Notification.Service;
-public class EmailService : IEmailService
+
+public interface INotificationService
 {
-    public async Task SendAsync(string to, string subject, string body)
-    {
-        // SMTP logic (MailKit)
-    }
+    Task SendBookingCreatedAsync(BookingCreatedEvent e);
 }

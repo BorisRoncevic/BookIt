@@ -1,25 +1,31 @@
 using BookingS.Service.Application.Interfaces;
 using BookingS.Service.Model;
+using Notification.Service;
 using Booking = BookingS.Service.Model.Booking;
 
 namespace BookingS.Service.Application.Services;
 
-public class BookingService
+public class BookingService : IBookingService
 {
     private readonly IBookingRepository _repo;
+    private readonly INotificationService _notificationService;
 
-    public BookingService(IBookingRepository repo)
+    public BookingService(IBookingRepository repo, INotificationService notificationService)
     {
         _repo = repo;
+        _notificationService = notificationService;
     }
+
+    public async Task<List<BookedRangeResponse>> GetBookedRangesAsync(Guid venueId)
+{
+    return await _repo.GetBookedRangesAsync(venueId);
+}
 
     public async Task<Booking> CreateBookingAsync(CreateBookingRequest request, Guid userId)
     {
-        // ✔️ validacija
         if (request.CheckIn >= request.CheckOut)
             throw new Exception("Invalid date range");
 
-        // ✔️ overlap check direktno u DB
         bool overlap = await _repo.HasOverlapAsync(
             request.VenueId,
             request.CheckIn,
@@ -30,8 +36,6 @@ public class BookingService
             throw new Exception("Dates not available");
 
         int nights = (request.CheckOut - request.CheckIn).Days;
-
-        // TODO: kasnije iz VenueService
         decimal pricePerNight = 100;
 
         var booking = new Booking
@@ -47,6 +51,22 @@ public class BookingService
         };
 
         await _repo.AddAsync(booking);
+
+        try
+        {
+            await _notificationService.SendBookingCreatedAsync(new BookingCreatedEvent
+            {
+                BookingId = booking.Id,
+                Email = "user@mail.com",
+                VenueId = booking.VenueId,
+                CheckIn = booking.CheckIn,
+                CheckOut = booking.CheckOut,
+                TotalPrice = booking.TotalPrice
+            });
+        }
+        catch
+        {
+        }
 
         return booking;
     }

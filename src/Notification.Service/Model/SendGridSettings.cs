@@ -1,3 +1,5 @@
+namespace Notification.Service;
+
 public class SendGridSettings
 {
     public string ApiKey { get; set; } = null!;

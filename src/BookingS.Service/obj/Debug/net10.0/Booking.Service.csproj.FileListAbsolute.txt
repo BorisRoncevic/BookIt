@@ -77,3 +77,12 @@
 /Users/borisroncevic/Desktop/AirbnbBooking/src/BookingS.Service/obj/Debug/net10.0/Booking.Service.pdb
 /Users/borisroncevic/Desktop/AirbnbBooking/src/BookingS.Service/obj/Debug/net10.0/Booking.Service.genruntimeconfig.cache
 /Users/borisroncevic/Desktop/AirbnbBooking/src/BookingS.Service/obj/Debug/net10.0/ref/Booking.Service.dll
+/Users/borisroncevic/Desktop/AirbnbBooking/src/BookingS.Service/bin/Debug/net10.0/Notification.Service.deps.json
+/Users/borisroncevic/Desktop/AirbnbBooking/src/BookingS.Service/bin/Debug/net10.0/Notification.Service.runtimeconfig.json
+/Users/borisroncevic/Desktop/AirbnbBooking/src/BookingS.Service/bin/Debug/net10.0/Notification.Service.staticwebassets.endpoints.json
+/Users/borisroncevic/Desktop/AirbnbBooking/src/BookingS.Service/bin/Debug/net10.0/Notification.Service
+/Users/borisroncevic/Desktop/AirbnbBooking/src/BookingS.Service/bin/Debug/net10.0/Newtonsoft.Json.dll
+/Users/borisroncevic/Desktop/AirbnbBooking/src/BookingS.Service/bin/Debug/net10.0/SendGrid.dll
+/Users/borisroncevic/Desktop/AirbnbBooking/src/BookingS.Service/bin/Debug/net10.0/StarkbankEcdsa.dll
+/Users/borisroncevic/Desktop/AirbnbBooking/src/BookingS.Service/bin/Debug/net10.0/Notification.Service.dll
+/Users/borisroncevic/Desktop/AirbnbBooking/src/BookingS.Service/bin/Debug/net10.0/Notification.Service.pdb

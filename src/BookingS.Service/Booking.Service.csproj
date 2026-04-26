@@ -14,4 +14,8 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.6" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Notification.Service\Notification.Service.csproj" />
+  </ItemGroup>
+
 </Project>

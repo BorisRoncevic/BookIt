@@ -19,3 +19,8 @@ export type Booking = {
 
   createdAt: string;  
 };
+
+export type BookedRange = {
+  checkIn: string;
+  checkOut: string;
+};

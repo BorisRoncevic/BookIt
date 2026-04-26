@@ -50,5 +50,22 @@ export type CreateVenueRequest = {
   bedrooms: number;
   bathrooms: number;
 
-  amenities: number[]; // ID-evi
+  amenityIds: number[];
+};
+
+export type UpdateVenueRequest = {
+  title: string;
+  description: string;
+
+  city: string;
+  country: string;
+  address: string;
+
+  pricePerNight: number;
+
+  maxGuests: number;
+  bedrooms: number;
+  bathrooms: number;
+
+  amenityIds: number[];
 };

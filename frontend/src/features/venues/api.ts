@@ -1,6 +1,6 @@
 import { getToken,buildHeaders } from "../auth/useAuth";
 import { BASE_URL } from "../auth/api";
-import type { Venue,CreateVenueRequest } from "./types";
+import type { Venue,CreateVenueRequest,UpdateVenueRequest, Amenity} from "./types";
 
 
 export async function createVenue(
@@ -26,9 +26,19 @@ export async function createVenue(
   return res.json();
 }
 
+export async function getAmenities(): Promise<Amenity[]> {
+  const res = await fetch(`${BASE_URL}/amenities`);
+
+  if (!res.ok) {
+    throw new Error("Failed to load amenities");
+  }
+
+  return res.json();
+}
+
 export async function getVenues(): Promise<Venue[]> {
-  const token = getToken(); // ako je endpoint public, možeš i bez tokena
-  const res = await fetch(`${API_URL}/api/venues`, {
+  const token = getToken(); 
+  const res = await fetch(`${BASE_URL}/api/venues`, {
     method: "GET",
     headers: buildHeaders(token),
   });
@@ -37,16 +47,35 @@ export async function getVenues(): Promise<Venue[]> {
   return res.json();
 }
 
-// GET /api/venues/{id}
 export async function getVenueById(id: string): Promise<Venue> {
   const token = getToken();
-  const res = await fetch(`${API_URL}/api/venues/${id}`, {
+  const res = await fetch(`${BASE_URL}/api/venues/${id}`, {
     method: "GET",
     headers: buildHeaders(token),
   });
 
   if (res.status === 404) throw new Error("Venue not found");
   if (!res.ok) throw new Error("Failed to fetch venue");
+
+  return res.json();
+}
+
+export async function updateVenue(
+  id: string,
+  data: UpdateVenueRequest
+): Promise<Venue> {
+  const token = getToken();
+  if (!token) throw new Error("Unauthorized");
+
+  const res = await fetch(`${BASE_URL}/api/venues/${id}`, {
+    method: "PUT",
+    headers: buildHeaders(token),
+    body: JSON.stringify(data),
+  });
+
+  if (res.status === 404) throw new Error("Venue not found");
+  if (res.status === 401) throw new Error("Unauthorized");
+  if (!res.ok) throw new Error("Failed to update venue");
 
   return res.json();
 }

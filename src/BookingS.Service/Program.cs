@@ -1,12 +1,12 @@
 using BookingS.Service.Application.Interfaces;
 using BookingS.Service;
 using BookingS.Service.Infrastructure;
+using BookingS.Service.Application.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Notification.Service;
 using System.Text;
-using BookingS.Service.Application.Services;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,7 +17,9 @@ builder.Services.AddDbContext<BookingDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
-builder.Services.AddScoped<BookingService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IBookingService, BookingService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

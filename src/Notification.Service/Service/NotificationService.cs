@@ -1,9 +1,6 @@
 using Notification.Service;
 
-public interface INotificationService
-{
-    Task SendBookingCreatedAsync(BookingCreatedEvent e);
-}
+namespace Notification.Service;
 
 public class NotificationService : INotificationService
 {

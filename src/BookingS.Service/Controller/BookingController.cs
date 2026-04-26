@@ -33,6 +33,13 @@ public class BookingController : ControllerBase
         return Ok(booking);
     }
 
+    [HttpGet("venue/{venueId}/booked-ranges")]
+public async Task<IActionResult> GetBookedRanges(Guid venueId)
+{
+    var ranges = await _service.GetBookedRangesAsync(venueId);
+    return Ok(ranges);
+}
+
     [HttpPost("{id}/cancel")]
     public async Task<IActionResult> Cancel(Guid id)
     {
