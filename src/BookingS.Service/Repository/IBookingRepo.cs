@@ -10,9 +10,8 @@ public interface IBookingRepository
     Task UpdateAsync(Booking booking);
 
     Task<List<Booking>> GetByVenueIdAsync(Guid venueId);
-        Task<List<BookedRangeResponse>> GetBookedRangesAsync(Guid venueId);
-
-
+    Task<List<Booking>> GetByUserIdAsync(Guid userId);
+    Task<List<BookedRangeResponse>> GetBookedRangesAsync(Guid venueId);
 
     Task<bool> HasOverlapAsync(Guid venueId, DateTime checkIn, DateTime checkOut);
 }

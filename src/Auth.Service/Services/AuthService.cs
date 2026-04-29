@@ -23,12 +23,13 @@ public class AuthService
 
         var user = new User
         {
-            Id = Users.Count + 1,
+            Id = Guid.NewGuid(),
             Email = request.Email,
             FirstName = request.FirstName,
             LastName = request.LastName,
+            Phone = request.Phone,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
-            Role = "Customer",
+            Role = request.Role,
         };
 
         Users.Add(user);

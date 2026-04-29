@@ -6,7 +6,7 @@ export default function LoginPage() {
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
-    username: "",
+    email: "",
     password: ""
   });
 
@@ -48,10 +48,10 @@ export default function LoginPage() {
           <label>Username</label>
           <input
             type="text"
-            name="username"
-            value={form.username}
+            name="email"
+            value={form.email}
             onChange={handleChange}
-            placeholder="Enter username"
+            placeholder="Enter email"
             required
           />
         </div>

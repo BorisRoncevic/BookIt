@@ -8,4 +8,11 @@ public class BookingDbContext : DbContext
         : base(options) {}
 
     public DbSet<Booking> Bookings { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Booking>()
+            .Property(x => x.TotalPrice)
+            .HasPrecision(18, 2);
+    }
 }

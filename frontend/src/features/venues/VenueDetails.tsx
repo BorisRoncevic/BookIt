@@ -1,26 +1,40 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import type { Venue } from "./types";
-import { getVenueById } from "./api";
+import { deleteVenue, getVenueById } from "./api";
+import { getCurrentUserId } from "../auth/useAuth";
 
-import type { BookedRange } from "../bookings/types";
-import { createBooking, getBookedRanges } from "../bookings/api";
+import type { BookedRange, Booking } from "../bookings/types";
+import {
+  cancelBooking,
+  createBooking,
+  getBookedRanges,
+  getVenueBookings
+} from "../bookings/api";
 
 export default function VenueDetails() {
   const [venue, setVenue] = useState<Venue | null>(null);
   const [bookedRanges, setBookedRanges] = useState<BookedRange[]>([]);
+  const [ownerBookings, setOwnerBookings] = useState<Booking[]>([]);
 
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
 
   const [loading, setLoading] = useState(true);
   const [bookingLoading, setBookingLoading] = useState(false);
+  const [ownerBookingsLoading, setOwnerBookingsLoading] = useState(false);
+  const [cancelingBookingId, setCancelingBookingId] = useState<string | null>(
+    null
+  );
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
   const { id } = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function loadVenueDetails() {
@@ -35,9 +49,18 @@ export default function VenueDetails() {
 
         setVenue(venueData);
         setBookedRanges(rangesData);
+
+        if (venueData.ownerId === getCurrentUserId()) {
+          setOwnerBookingsLoading(true);
+          const bookingsData = await getVenueBookings(id);
+          setOwnerBookings(bookingsData);
+        } else {
+          setOwnerBookings([]);
+        }
       } catch {
         setError("Failed to load venue details.");
       } finally {
+        setOwnerBookingsLoading(false);
         setLoading(false);
       }
     }
@@ -122,7 +145,66 @@ export default function VenueDetails() {
     }
   }
 
-  const today = new Date().toISOString().split("T")[0];
+  async function handleDeleteVenue() {
+    if (!venue) return;
+
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this venue?"
+    );
+    if (!confirmed) return;
+
+    try {
+      setDeleteLoading(true);
+      setError("");
+      await deleteVenue(venue.id);
+      navigate("/venues");
+    } catch {
+      setError("Failed to delete venue.");
+    } finally {
+      setDeleteLoading(false);
+    }
+  }
+
+  async function handleOwnerCancelBooking(bookingId: string) {
+    if (!venue) return;
+
+    const confirmed = window.confirm(
+      "Are you sure you want to cancel this booking?"
+    );
+    if (!confirmed) return;
+
+    try {
+      setCancelingBookingId(bookingId);
+      setError("");
+      setSuccessMessage("");
+
+      await cancelBooking(bookingId);
+
+      setOwnerBookings((prev) =>
+        prev.map((booking) =>
+          booking.id === bookingId
+            ? { ...booking, status: "Cancelled" }
+            : booking
+        )
+      );
+
+      const updatedRanges = await getBookedRanges(venue.id);
+      setBookedRanges(updatedRanges);
+
+      setSuccessMessage("Booking cancelled successfully.");
+    } catch {
+      setError("Failed to cancel booking.");
+    } finally {
+      setCancelingBookingId(null);
+    }
+  }
+
+  const today = new Date().toISOString().slice(0, 10);
+  const isOwner = venue?.ownerId === getCurrentUserId();
+  const canCancelOwnerBooking = (booking: Booking) => {
+    const checkOutDate = booking.checkOut.slice(0, 10);
+    return booking.status === "Confirmed" && checkOutDate >= today;
+  };
 
   if (loading) {
     return (
@@ -143,11 +225,34 @@ export default function VenueDetails() {
   return (
     <div className="venue-details-page">
       <div className="venue-header">
-        <h1>{venue.title}</h1>
+        <div>
+          <h1>{venue.title}</h1>
 
-        <p>
-          {venue.address}, {venue.city}, {venue.country}
-        </p>
+          <p>
+            {venue.address}, {venue.city}, {venue.country}
+          </p>
+        </div>
+
+        {isOwner && (
+          <div className="owner-actions">
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={() => navigate(`/venues/${venue.id}/edit`)}
+            >
+              Edit venue
+            </button>
+
+            <button
+              type="button"
+              className="danger-button"
+              onClick={handleDeleteVenue}
+              disabled={deleteLoading}
+            >
+              {deleteLoading ? "Deleting..." : "Delete venue"}
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="venue-images">
@@ -209,6 +314,65 @@ export default function VenueDetails() {
               {new Date(venue.createdAt).toLocaleDateString()}
             </p>
           </div>
+
+          {isOwner && (
+            <div className="owner-bookings">
+              <div className="owner-bookings-header">
+                <div>
+                  <h2>Guest bookings</h2>
+                  <p>Reservations made for this venue.</p>
+                </div>
+              </div>
+
+              {ownerBookingsLoading ? (
+                <p>Loading bookings...</p>
+              ) : ownerBookings.length === 0 ? (
+                <p>No guest bookings yet.</p>
+              ) : (
+                <div className="owner-bookings-list">
+                  {ownerBookings.map((booking) => (
+                    <div key={booking.id} className="owner-booking-row">
+                      <div>
+                        <strong>
+                          {new Date(booking.checkIn).toLocaleDateString()} -{" "}
+                          {new Date(booking.checkOut).toLocaleDateString()}
+                        </strong>
+
+                        <p>
+                          Guest ID: {booking.userId} · {booking.totalPrice} €
+                        </p>
+                      </div>
+
+                      <div className="owner-booking-actions">
+                        <span
+                          className={
+                            booking.status === "Confirmed"
+                              ? "status-confirmed"
+                              : "status-cancelled"
+                          }
+                        >
+                          {booking.status}
+                        </span>
+
+                        {canCancelOwnerBooking(booking) && (
+                          <button
+                            type="button"
+                            className="danger-button"
+                            onClick={() => handleOwnerCancelBooking(booking.id)}
+                            disabled={cancelingBookingId === booking.id}
+                          >
+                            {cancelingBookingId === booking.id
+                              ? "Cancelling..."
+                              : "Cancel"}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="venue-price-card">

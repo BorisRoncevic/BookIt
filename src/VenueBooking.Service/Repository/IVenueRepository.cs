@@ -5,6 +5,7 @@ public interface IVenueRepository
 {
     Task<Venue?> GetByIdAsync(Guid id);
     Task<List<Venue>> GetAllAsync();
+    Task<List<Amenity>> GetAmenitiesAsync();
 
     Task AddAsync(Venue venue);
     Task UpdateAsync(Venue venue);

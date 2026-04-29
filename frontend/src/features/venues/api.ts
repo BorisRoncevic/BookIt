@@ -8,7 +8,7 @@ export async function createVenue(
 ): Promise<Venue> {
   const token = getToken();
 
-  const res = await fetch(`${BASE_URL}/venue`, {
+  const res = await fetch(`${BASE_URL}/venues`, {
     method : "POST",
     headers : buildHeaders(token),
     body : JSON.stringify(data)
@@ -27,7 +27,7 @@ export async function createVenue(
 }
 
 export async function getAmenities(): Promise<Amenity[]> {
-  const res = await fetch(`${BASE_URL}/amenities`);
+  const res = await fetch(`${BASE_URL}/venues/amenities`);
 
   if (!res.ok) {
     throw new Error("Failed to load amenities");
@@ -38,7 +38,7 @@ export async function getAmenities(): Promise<Amenity[]> {
 
 export async function getVenues(): Promise<Venue[]> {
   const token = getToken(); 
-  const res = await fetch(`${BASE_URL}/api/venues`, {
+  const res = await fetch(`${BASE_URL}/venues`, {
     method: "GET",
     headers: buildHeaders(token),
   });
@@ -49,7 +49,7 @@ export async function getVenues(): Promise<Venue[]> {
 
 export async function getVenueById(id: string): Promise<Venue> {
   const token = getToken();
-  const res = await fetch(`${BASE_URL}/api/venues/${id}`, {
+  const res = await fetch(`${BASE_URL}/venues/${id}`, {
     method: "GET",
     headers: buildHeaders(token),
   });
@@ -63,11 +63,11 @@ export async function getVenueById(id: string): Promise<Venue> {
 export async function updateVenue(
   id: string,
   data: UpdateVenueRequest
-): Promise<Venue> {
+): Promise<void> {
   const token = getToken();
   if (!token) throw new Error("Unauthorized");
 
-  const res = await fetch(`${BASE_URL}/api/venues/${id}`, {
+  const res = await fetch(`${BASE_URL}/venues/${id}`, {
     method: "PUT",
     headers: buildHeaders(token),
     body: JSON.stringify(data),
@@ -75,7 +75,21 @@ export async function updateVenue(
 
   if (res.status === 404) throw new Error("Venue not found");
   if (res.status === 401) throw new Error("Unauthorized");
+  if (res.status === 403) throw new Error("Forbidden");
   if (!res.ok) throw new Error("Failed to update venue");
+}
 
-  return res.json();
+export async function deleteVenue(id: string): Promise<void> {
+  const token = getToken();
+  if (!token) throw new Error("Unauthorized");
+
+  const res = await fetch(`${BASE_URL}/venues/${id}`, {
+    method: "DELETE",
+    headers: buildHeaders(token),
+  });
+
+  if (res.status === 404) throw new Error("Venue not found");
+  if (res.status === 401) throw new Error("Unauthorized");
+  if (res.status === 403) throw new Error("Forbidden");
+  if (!res.ok) throw new Error("Failed to delete venue");
 }

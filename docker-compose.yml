@@ -1,11 +1,19 @@
-version: "3.9"
-
 services:
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE_URL: http://localhost:5080/api
+    ports:
+      - "3000:80"
+    depends_on:
+      - gateway
 
   gateway:
     build: ./src/ApiGateway
     ports:
-      - "5000:8080"
+      - "5080:8080"
     depends_on:
       - auth
       - booking
@@ -16,16 +24,23 @@ services:
     build: ./src/Auth.Service
     ports:
       - "5001:8080"
+    depends_on:
+      - db
 
   booking:
     build: ./src/BookingS.Service
     ports:
       - "5002:8080"
+    depends_on:
+      - db
+      - notification
 
   venue:
     build: ./src/VenueBooking.Service
     ports:
       - "5003:8080"
+    depends_on:
+      - db
 
   notification:
     build: ./src/Notification.Service
@@ -33,9 +48,10 @@ services:
       - "5004:8080"
 
   db:
-    image: mcr.microsoft.com/mssql/server:2022-latest
+    image: mcr.microsoft.com/azure-sql-edge:latest
     environment:
       - ACCEPT_EULA=Y
       - SA_PASSWORD=YourStrong!Pass123
+      - MSSQL_SA_PASSWORD=YourStrong!Pass123
     ports:
       - "1433:1433"

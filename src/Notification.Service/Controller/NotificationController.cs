@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Notification.Service.Services;
 
 namespace Notification.Service.Controllers;
 

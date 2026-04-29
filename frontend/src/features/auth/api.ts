@@ -1,7 +1,8 @@
-export const BASE_URL = "http://localhost:5000/api";
+export const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5080/api";
+const AUTH_URL = `${BASE_URL}/auth`;
 
 export async function login(data:unknown) {
-  const res = await fetch(`${BASE_URL}/login`, {
+  const res = await fetch(`${AUTH_URL}/login`, {
     method: "POST",
     headers : {
         "Content-Type" : "application/json"
@@ -21,7 +22,7 @@ export async function login(data:unknown) {
 export async function register(data: unknown) {
   console.log("Saljem na backend:", data);
 
-  const res = await fetch(`${BASE_URL}/register`, {
+  const res = await fetch(`${AUTH_URL}/register`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

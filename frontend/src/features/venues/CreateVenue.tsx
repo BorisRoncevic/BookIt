@@ -22,15 +22,17 @@ export default function CreateVenuePage() {
   const [amenities, setAmenities] = useState<Amenity[]>([]);
   const [loading, setLoading] = useState(false);
   const [amenitiesLoading, setAmenitiesLoading] = useState(true);
+  const [amenitiesError, setAmenitiesError] = useState("");
   const [error, setError] = useState("");
 
   useEffect(() => {
     async function loadAmenities() {
       try {
+        setAmenitiesError("");
         const data = await getAmenities();
         setAmenities(data);
       } catch {
-        setError("Failed to load amenities.");
+        setAmenitiesError("Failed to load amenities.");
       } finally {
         setAmenitiesLoading(false);
       }
@@ -210,6 +212,8 @@ export default function CreateVenuePage() {
 
           {amenitiesLoading ? (
             <p>Loading amenities...</p>
+          ) : amenitiesError ? (
+            <p className="error-message">{amenitiesError}</p>
           ) : (
             <div className="amenities-list">
               {amenities.map((amenity) => (

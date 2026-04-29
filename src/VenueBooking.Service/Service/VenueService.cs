@@ -22,10 +22,20 @@ public class VenueService : IVenueService
         return await _repo.GetByIdAsync(id);
     }
 
+    public async Task<List<Amenity>> GetAmenitiesAsync()
+    {
+        return await _repo.GetAmenitiesAsync();
+    }
+
     public async Task<Venue> CreateAsync(Venue venue)
     {
         venue.Id = Guid.NewGuid();
         venue.CreatedAt = DateTime.UtcNow;
+
+        foreach (var amenity in venue.Amenities)
+        {
+            amenity.VenueId = venue.Id;
+        }
 
         await _repo.AddAsync(venue);
 
@@ -39,6 +49,10 @@ public class VenueService : IVenueService
             return false;
 
         venue.Id = id;
+        foreach (var amenity in venue.Amenities)
+        {
+            amenity.VenueId = id;
+        }
 
         await _repo.UpdateAsync(venue);
 

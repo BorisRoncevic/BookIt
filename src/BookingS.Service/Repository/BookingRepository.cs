@@ -34,7 +34,9 @@ public class BookingRepository : IBookingRepository
     public async Task<List<Booking>> GetByVenueIdAsync(Guid venueId)
     {
         return await _context.Bookings
+            .AsNoTracking()
             .Where(b => b.VenueId == venueId)
+            .OrderByDescending(b => b.CheckIn)
             .ToListAsync();
     }
 
@@ -42,7 +44,7 @@ public class BookingRepository : IBookingRepository
     {
         return await _context.Bookings.AnyAsync(b =>
             b.VenueId == venueId &&
-            b.Status != BookingStatus.Confirmed &&
+            b.Status == BookingStatus.Confirmed &&
             checkIn < b.CheckOut &&
             checkOut > b.CheckIn
         );
@@ -63,11 +65,12 @@ public class BookingRepository : IBookingRepository
 }
 
     
-public async Task<List<Booking>> GetByUserIdAsync(Guid userId)
-{
-    return await _context.Bookings
-        .AsNoTracking()
-        .Where(b => b.UserId == userId)
-        .ToListAsync();
-}
+    public async Task<List<Booking>> GetByUserIdAsync(Guid userId)
+    {
+        return await _context.Bookings
+            .AsNoTracking()
+            .Where(b => b.UserId == userId)
+            .OrderByDescending(b => b.CreatedAt)
+            .ToListAsync();
+    }
 }
