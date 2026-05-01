@@ -9,21 +9,24 @@ public class BookingService : IBookingService
     private readonly IBookingRepository _repo;
     private readonly INotificationClient _notificationClient;
     private readonly IVenueClient _venueClient;
+    private readonly ILogger<BookingService> _logger;
 
     public BookingService(
         IBookingRepository repo,
         INotificationClient notificationClient,
-        IVenueClient venueClient)
+        IVenueClient venueClient,
+        ILogger<BookingService> logger)
     {
         _repo = repo;
         _notificationClient = notificationClient;
         _venueClient = venueClient;
+        _logger = logger;
     }
 
     public async Task<List<BookedRangeResponse>> GetBookedRangesAsync(Guid venueId)
-{
-    return await _repo.GetBookedRangesAsync(venueId);
-}
+    {
+        return await _repo.GetBookedRangesAsync(venueId);
+    }
 
     public async Task<List<Booking>> GetMyBookingsAsync(Guid userId)
     {
@@ -40,7 +43,7 @@ public class BookingService : IBookingService
         return await _repo.GetByVenueIdAsync(venueId);
     }
 
-    public async Task<Booking> CreateBookingAsync(CreateBookingRequest request, Guid userId)
+    public async Task<Booking> CreateBookingAsync(CreateBookingRequest request, Guid userId, string userEmail)
     {
         if (request.CheckIn >= request.CheckOut)
             throw new Exception("Invalid date range");
@@ -62,6 +65,7 @@ public class BookingService : IBookingService
             Id = Guid.NewGuid(),
             VenueId = request.VenueId,
             UserId = userId,
+            UserEmail = userEmail,
             CheckIn = request.CheckIn,
             CheckOut = request.CheckOut,
             TotalPrice = nights * pricePerNight,
@@ -76,21 +80,22 @@ public class BookingService : IBookingService
             await _notificationClient.SendBookingCreatedAsync(new BookingCreatedEvent
             {
                 BookingId = booking.Id,
-                Email = "user@mail.com",
+                Email = userEmail,
                 VenueId = booking.VenueId,
                 CheckIn = booking.CheckIn,
                 CheckOut = booking.CheckOut,
                 TotalPrice = booking.TotalPrice
             });
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogWarning(ex, "Failed to send booking confirmation email for booking {BookingId}", booking.Id);
         }
 
         return booking;
     }
 
-    public async Task<CancelBookingResult> CancelAsync(Guid id, Guid userId)
+    public async Task<CancelBookingResult> CancelAsync(Guid id, Guid userId, string? userEmail)
     {
         var booking = await _repo.GetByIdAsync(id);
 
@@ -112,6 +117,30 @@ public class BookingService : IBookingService
         booking.Status = BookingStatus.Cancelled;
 
         await _repo.UpdateAsync(booking);
+
+        var notificationEmail = booking.UserEmail;
+        if (string.IsNullOrWhiteSpace(notificationEmail) && booking.UserId == userId)
+            notificationEmail = userEmail;
+
+        if (!string.IsNullOrWhiteSpace(notificationEmail))
+        {
+            try
+            {
+                await _notificationClient.SendBookingCancelledAsync(new BookingCancelledEvent
+                {
+                    BookingId = booking.Id,
+                    Email = notificationEmail,
+                    VenueId = booking.VenueId,
+                    CheckIn = booking.CheckIn,
+                    CheckOut = booking.CheckOut,
+                    TotalPrice = booking.TotalPrice
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to send booking cancellation email for booking {BookingId}", booking.Id);
+            }
+        }
 
         return CancelBookingResult.Cancelled;
     }

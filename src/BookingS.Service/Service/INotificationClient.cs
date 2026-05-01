@@ -5,4 +5,5 @@ namespace BookingS.Service.Application.Services;
 public interface INotificationClient
 {
     Task SendBookingCreatedAsync(BookingCreatedEvent e);
+    Task SendBookingCancelledAsync(BookingCancelledEvent e);
 }

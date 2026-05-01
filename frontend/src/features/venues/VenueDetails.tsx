@@ -13,17 +13,30 @@ import {
   getBookedRanges,
   getVenueBookings
 } from "../bookings/api";
+import type { Review, ReviewSummary } from "../reviews/types";
+import {
+  createReview,
+  getReviewSummary,
+  getVenueReviews
+} from "../reviews/api";
 
 export default function VenueDetails() {
   const [venue, setVenue] = useState<Venue | null>(null);
   const [bookedRanges, setBookedRanges] = useState<BookedRange[]>([]);
   const [ownerBookings, setOwnerBookings] = useState<Booking[]>([]);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviewSummary, setReviewSummary] = useState<ReviewSummary | null>(
+    null
+  );
 
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState("");
 
   const [loading, setLoading] = useState(true);
   const [bookingLoading, setBookingLoading] = useState(false);
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
   const [ownerBookingsLoading, setOwnerBookingsLoading] = useState(false);
   const [cancelingBookingId, setCancelingBookingId] = useState<string | null>(
     null
@@ -44,11 +57,18 @@ export default function VenueDetails() {
         setLoading(true);
         setError("");
 
-        const venueData = await getVenueById(id);
-        const rangesData = await getBookedRanges(id);
+        const [venueData, rangesData, reviewsData, summaryData] =
+          await Promise.all([
+            getVenueById(id),
+            getBookedRanges(id),
+            getVenueReviews(id),
+            getReviewSummary(id)
+          ]);
 
         setVenue(venueData);
         setBookedRanges(rangesData);
+        setReviews(reviewsData);
+        setReviewSummary(summaryData);
 
         if (venueData.ownerId === getCurrentUserId()) {
           setOwnerBookingsLoading(true);
@@ -145,6 +165,44 @@ export default function VenueDetails() {
     }
   }
 
+  async function handleReviewSubmit() {
+    if (!venue) return;
+
+    if (!reviewComment.trim()) {
+      setError("Please enter a review comment.");
+      return;
+    }
+
+    try {
+      setReviewSubmitting(true);
+      setError("");
+      setSuccessMessage("");
+
+      await createReview({
+        venueId: venue.id,
+        rating: reviewRating,
+        comment: reviewComment
+      });
+
+      const [updatedReviews, updatedSummary] = await Promise.all([
+        getVenueReviews(venue.id),
+        getReviewSummary(venue.id)
+      ]);
+
+      setReviews(updatedReviews);
+      setReviewSummary(updatedSummary);
+      setReviewRating(5);
+      setReviewComment("");
+      setSuccessMessage("Review added successfully.");
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to create review."
+      );
+    } finally {
+      setReviewSubmitting(false);
+    }
+  }
+
   async function handleDeleteVenue() {
     if (!venue) return;
 
@@ -200,7 +258,13 @@ export default function VenueDetails() {
   }
 
   const today = new Date().toISOString().slice(0, 10);
-  const isOwner = venue?.ownerId === getCurrentUserId();
+  const currentUserId = getCurrentUserId();
+  const isOwner = venue?.ownerId === currentUserId;
+  const hasMyReview =
+    currentUserId != null &&
+    reviews.some((review) => review.userId === currentUserId);
+  const reviewCount = reviewSummary?.reviewCount ?? 0;
+  const averageRating = reviewSummary?.averageRating ?? 0;
   const canCancelOwnerBooking = (booking: Booking) => {
     const checkOutDate = booking.checkOut.slice(0, 10);
     return booking.status === "Confirmed" && checkOutDate >= today;
@@ -230,6 +294,14 @@ export default function VenueDetails() {
 
           <p>
             {venue.address}, {venue.city}, {venue.country}
+          </p>
+
+          <p className="venue-rating">
+            {reviewCount > 0
+              ? `${averageRating.toFixed(1)} / 5 · ${reviewCount} ${
+                  reviewCount === 1 ? "review" : "reviews"
+                }`
+              : "No reviews yet"}
           </p>
         </div>
 
@@ -303,6 +375,84 @@ export default function VenueDetails() {
               </ul>
             ) : (
               <p>No amenities listed.</p>
+            )}
+          </div>
+
+          <div className="venue-reviews">
+            <div className="reviews-header">
+              <div>
+                <h2>Reviews</h2>
+                <p>
+                  {reviewCount > 0
+                    ? `${averageRating.toFixed(1)} average rating from ${reviewCount} ${
+                        reviewCount === 1 ? "review" : "reviews"
+                      }.`
+                    : "No reviews yet."}
+                </p>
+              </div>
+            </div>
+
+            {currentUserId ? (
+              hasMyReview ? (
+                <p>You already reviewed this venue.</p>
+              ) : (
+                <div className="review-form">
+                  <div className="form-group">
+                    <label>Rating</label>
+                    <select
+                      value={reviewRating}
+                      onChange={(e) =>
+                        setReviewRating(Number(e.target.value))
+                      }
+                    >
+                      <option value={5}>5 - Excellent</option>
+                      <option value={4}>4 - Very good</option>
+                      <option value={3}>3 - Good</option>
+                      <option value={2}>2 - Fair</option>
+                      <option value={1}>1 - Poor</option>
+                    </select>
+                  </div>
+
+                  <div className="form-group">
+                    <label>Comment</label>
+                    <textarea
+                      value={reviewComment}
+                      maxLength={1000}
+                      onChange={(e) => setReviewComment(e.target.value)}
+                      placeholder="Share your experience with this venue."
+                    />
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleReviewSubmit}
+                    disabled={reviewSubmitting}
+                  >
+                    {reviewSubmitting ? "Submitting..." : "Leave review"}
+                  </button>
+                </div>
+              )
+            ) : (
+              <p>Please log in to leave a review.</p>
+            )}
+
+            {reviews.length === 0 ? (
+              <p>No comments yet.</p>
+            ) : (
+              <div className="reviews-list">
+                {reviews.map((review) => (
+                  <div key={review.id} className="review-row">
+                    <div className="review-row-header">
+                      <strong>{review.rating} / 5</strong>
+                      <span>
+                        {new Date(review.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+
+                    <p>{review.comment}</p>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
 

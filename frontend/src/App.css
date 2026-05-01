@@ -116,6 +116,12 @@
   line-height: 1.55;
 }
 
+.venue-header .venue-rating {
+  margin-top: 8px;
+  color: #0f5e5b;
+  font-weight: 800;
+}
+
 .eyebrow {
   display: inline-flex;
   margin-bottom: 10px;
@@ -492,6 +498,58 @@ button:disabled {
   gap: 12px;
   border-top: 1px solid #edf0f2;
   padding-top: 18px;
+}
+
+.venue-reviews {
+  display: grid;
+  gap: 14px;
+  border-top: 1px solid #edf0f2;
+  padding-top: 18px;
+}
+
+.reviews-header p,
+.review-row p {
+  color: #667085;
+  font-size: 14px;
+}
+
+.review-form {
+  display: grid;
+  gap: 12px;
+  border: 1px solid #edf0f2;
+  border-radius: 8px;
+  padding: 14px;
+  background: #f8faf9;
+}
+
+.reviews-list {
+  display: grid;
+  gap: 10px;
+}
+
+.review-row {
+  display: grid;
+  gap: 8px;
+  border: 1px solid #edf0f2;
+  border-radius: 8px;
+  padding: 14px;
+  background: #ffffff;
+}
+
+.review-row-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.review-row-header strong {
+  color: #0f5e5b;
+}
+
+.review-row-header span {
+  color: #667085;
+  font-size: 13px;
 }
 
 .owner-bookings-header p,

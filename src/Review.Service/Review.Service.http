@@ -1,6 +1,21 @@
 @Review.Service_HostAddress = http://localhost:5005
 
-GET {{Review.Service_HostAddress}}/weatherforecast/
+GET {{Review.Service_HostAddress}}/api/reviews/venue/00000000-0000-0000-0000-000000000000
 Accept: application/json
 
 ###
+
+GET {{Review.Service_HostAddress}}/api/reviews/venue/00000000-0000-0000-0000-000000000000/summary
+Accept: application/json
+
+###
+
+POST {{Review.Service_HostAddress}}/api/reviews
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "venueId": "00000000-0000-0000-0000-000000000000",
+  "rating": 5,
+  "comment": "Great stay."
+}

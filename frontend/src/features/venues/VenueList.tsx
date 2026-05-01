@@ -4,14 +4,41 @@ import { getVenues } from "./api";
 import type { Venue } from "./types";
 import { useParams } from "react-router-dom";
 import VenueCard from "./VenueCard";
+import { getReviewSummary } from "../reviews/api";
+import type { ReviewSummary } from "../reviews/types";
 
 export default function VenueList() {
   const [venues, setVenues] = useState<Venue[]>([]);
+  const [summaries, setSummaries] = useState<Record<string, ReviewSummary>>(
+    {}
+  );
   const navigate = useNavigate();
   const { city } = useParams();
 
   useEffect(() => {
-    getVenues().then(setVenues);
+    async function loadVenues() {
+      const venuesData = await getVenues();
+      setVenues(venuesData);
+
+      const summaryEntries = await Promise.all(
+        venuesData.map(async (venue) => {
+          try {
+            const summary = await getReviewSummary(venue.id);
+            return [venue.id, summary] as const;
+          } catch {
+            return null;
+          }
+        })
+      );
+
+      setSummaries(
+        Object.fromEntries(
+          summaryEntries.filter((entry) => entry !== null)
+        )
+      );
+    }
+
+    loadVenues();
   }, []);
 
   const visibleVenues = city
@@ -42,6 +69,7 @@ export default function VenueList() {
             <VenueCard
               key={venue.id}
               venue={venue}
+              summary={summaries[venue.id]}
               onClick={() => navigate(`/venues/${venue.id}`)}
             />
           ))}

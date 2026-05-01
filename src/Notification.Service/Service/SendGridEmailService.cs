@@ -37,7 +37,6 @@ public class SendGridEmailService : IEmailService
         }
     }
 
-    // ✔️ fallback plain text (spam filter + compatibility)
     private static string StripHtml(string html)
     {
         return System.Text.RegularExpressions.Regex

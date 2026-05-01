@@ -30,4 +30,22 @@ public class NotificationController : ControllerBase
             });
         }
     }
+
+    [HttpPost("booking-cancelled")]
+    public async Task<IActionResult> BookingCancelled([FromBody] BookingCancelledEvent e)
+    {
+        try
+        {
+            await _service.SendBookingCancelledAsync(e);
+            return Ok(new { message = "Email sent successfully" });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new
+            {
+                message = "Failed to send email",
+                error = ex.Message
+            });
+        }
+    }
 }

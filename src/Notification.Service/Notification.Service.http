@@ -1,6 +1,27 @@
 @Notification.Service_HostAddress = http://localhost:5004
 
-GET {{Notification.Service_HostAddress}}/weatherforecast/
-Accept: application/json
+POST {{Notification.Service_HostAddress}}/api/notifications/booking-created
+Content-Type: application/json
+
+{
+  "bookingId": "00000000-0000-0000-0000-000000000000",
+  "email": "guest@example.com",
+  "venueId": "00000000-0000-0000-0000-000000000000",
+  "checkIn": "2026-06-01T00:00:00Z",
+  "checkOut": "2026-06-05T00:00:00Z",
+  "totalPrice": 400
+}
 
 ###
+
+POST {{Notification.Service_HostAddress}}/api/notifications/booking-cancelled
+Content-Type: application/json
+
+{
+  "bookingId": "00000000-0000-0000-0000-000000000000",
+  "email": "guest@example.com",
+  "venueId": "00000000-0000-0000-0000-000000000000",
+  "checkIn": "2026-06-01T00:00:00Z",
+  "checkOut": "2026-06-05T00:00:00Z",
+  "totalPrice": 400
+}

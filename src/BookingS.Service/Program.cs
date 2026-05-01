@@ -81,6 +81,7 @@ static void EnsureCreatedWithRetry(DbContext db)
             }
 
             db.Database.EnsureCreated();
+            EnsureBookingSchema(db);
             return;
         }
         catch (Exception ex) when (attempt < 10)
@@ -89,6 +90,16 @@ static void EnsureCreatedWithRetry(DbContext db)
             Thread.Sleep(TimeSpan.FromSeconds(5));
         }
     }
+}
+
+static void EnsureBookingSchema(DbContext db)
+{
+    db.Database.ExecuteSqlRaw("""
+        IF OBJECT_ID(N'Bookings') IS NOT NULL AND COL_LENGTH(N'Bookings', N'UserEmail') IS NULL
+        BEGIN
+            ALTER TABLE Bookings ADD UserEmail nvarchar(320) NULL
+        END
+        """);
 }
 
 static bool TableExists(DbContext db, string tableName)

@@ -14,5 +14,9 @@ public class BookingDbContext : DbContext
         modelBuilder.Entity<Booking>()
             .Property(x => x.TotalPrice)
             .HasPrecision(18, 2);
+
+        modelBuilder.Entity<Booking>()
+            .Property(x => x.UserEmail)
+            .HasMaxLength(320);
     }
 }

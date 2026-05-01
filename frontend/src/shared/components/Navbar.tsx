@@ -12,16 +12,20 @@ export default function Navbar() {
   }
 
   return (
-    <header className="navbar">
-      <NavLink to="/" className="brand">
-        AirbnbBooking
+    <nav className="navbar">
+      <NavLink to="/venues" className="brand">
+        BookIt
       </NavLink>
 
-      <nav className="nav-links">
+      <div className="nav-links">
         <NavLink to="/venues">Venues</NavLink>
-        <NavLink to="/venues/new">Create venue</NavLink>
-        <NavLink to="/bookings">My bookings</NavLink>
-      </nav>
+        {isLoggedIn && <NavLink to="/bookings">My bookings</NavLink>}
+        {isLoggedIn && (
+          <NavLink to="/venues/new" className="primary-link">
+            Add venue
+          </NavLink>
+        )}
+      </div>
 
       <div className="nav-actions">
         {isLoggedIn ? (
@@ -37,6 +41,6 @@ export default function Navbar() {
           </>
         )}
       </div>
-    </header>
+    </nav>
   );
 }

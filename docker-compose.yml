@@ -18,6 +18,7 @@ services:
       - auth
       - booking
       - venue
+      - review
       - notification
 
   auth:
@@ -42,10 +43,21 @@ services:
     depends_on:
       - db
 
+  review:
+    build: ./src/Review.Service
+    ports:
+      - "5005:8080"
+    depends_on:
+      - db
+
   notification:
     build: ./src/Notification.Service
     ports:
       - "5004:8080"
+    environment:
+      - SendGrid__ApiKey=${SENDGRID_API_KEY:-}
+      - SendGrid__SenderEmail=${SENDGRID_SENDER_EMAIL:-}
+      - SendGrid__SenderName=${SENDGRID_SENDER_NAME:-Airbnb App}
 
   db:
     image: mcr.microsoft.com/azure-sql-edge:latest

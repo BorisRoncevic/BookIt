@@ -6,6 +6,7 @@ public class Booking
 
     public Guid VenueId { get; set; }
     public Guid UserId { get; set; }
+    public string? UserEmail { get; set; }
 
     public DateTime CheckIn { get; set; }
     public DateTime CheckOut { get; set; }

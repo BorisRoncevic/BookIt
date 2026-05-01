@@ -17,4 +17,10 @@ public class NotificationClient : INotificationClient
         var response = await _httpClient.PostAsJsonAsync("api/notifications/booking-created", e);
         response.EnsureSuccessStatusCode();
     }
+
+    public async Task SendBookingCancelledAsync(BookingCancelledEvent e)
+    {
+        var response = await _httpClient.PostAsJsonAsync("api/notifications/booking-cancelled", e);
+        response.EnsureSuccessStatusCode();
+    }
 }

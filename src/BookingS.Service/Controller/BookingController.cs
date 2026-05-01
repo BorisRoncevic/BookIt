@@ -28,9 +28,13 @@ public class BookingController : ControllerBase
         if (!TryGetUserId(out var userId))
             return Unauthorized();
 
+        var userEmail = GetUserEmail();
+        if (string.IsNullOrWhiteSpace(userEmail))
+            return BadRequest("User email is missing from token.");
+
         try
         {
-            var booking = await _service.CreateBookingAsync(request, userId);
+            var booking = await _service.CreateBookingAsync(request, userId, userEmail);
             return Ok(booking);
         }
         catch (Exception ex)
@@ -80,7 +84,7 @@ public async Task<IActionResult> GetBookedRanges(Guid venueId)
         if (!TryGetUserId(out var userId))
             return Unauthorized();
 
-        var result = await _service.CancelAsync(id, userId);
+        var result = await _service.CancelAsync(id, userId, GetUserEmail());
 
         return result switch
         {
@@ -111,5 +115,11 @@ public async Task<IActionResult> GetBookedRanges(Guid venueId)
 
         userId = Guid.Empty;
         return false;
+    }
+
+    private string? GetUserEmail()
+    {
+        return User.FindFirst(ClaimTypes.Email)?.Value
+               ?? User.FindFirst("email")?.Value;
     }
 }
